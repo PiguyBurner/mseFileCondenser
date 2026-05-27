@@ -110,6 +110,8 @@ def main():
     zf = zipfile.ZipFile("./output/combined.mse-set", mode="w")
     try:
         for filename in os.listdir("./output/"):
+            if filename == ".gitkeep":
+                continue
             zf.write("./output/" + filename, filename, compress_type=zipfile.ZIP_DEFLATED)
     except FileNotFoundError:
         print("that's really odd; file not found despite checking for all the files here")
@@ -141,7 +143,8 @@ def cleanUp(log=False):
         if log:
             print("Output folder has the following files:")
             for file in os.listdir("./output/"):
-                print(file)
+                if file != ".gitkeep":
+                    print(file)
             if input("\nDelete these files? Y for yes, n for no.\n") != "Y":
                 raise KeyboardInterrupt("Go get everything you need out of output!") 
         else:

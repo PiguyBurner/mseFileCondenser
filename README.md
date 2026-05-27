@@ -29,3 +29,5 @@ If you are getting some things complaining, make sure you have the most recent M
 If things still complain, try opening up and re-saving the files you want to combine. This was built with newer versions (as of 5/27/26) in mind; hopefully not much has changed and my error handling is adequate enough
 
 I doubt this code is perfect but it succeeded in my testing so that's good enough for me. Hopefully it helps whoever needs it, and don't judge my code
+
+If you are trying to debug it manually, comment out "cleanup()" on line 107 to keep all the unpacked files around.
