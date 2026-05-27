@@ -12,14 +12,11 @@ def main():
     print("Starting MSE Set Combiner! \n All will be one.")
 
     #  Sanity check on template file
-    if len(os.listdir("./place_template_set_here")) < 1:
-        print("Make sure you put in a template file! Stopping.")
+    if len([f for f in os.listdir("./place_template_set_here") if f == 'template.mse-set']) < 1:
+        print("Make sure you put in a template file! It must be named \"template.mse-set\"")
         return
-    elif len(os.listdir("./place_template_set_here")) > 1:
-        print("Only put in a single template file! Stopping.")
-        return
-    elif os.listdir("./place_template_set_here")[0] != "template.mse-set":
-        print("Make sure your template set is named \"template.mse-set\"! Stopping.")
+    elif len([f for f in os.listdir("./place_template_set_here") if f.endswith('.mse-set')]) > 1:
+        print("Only put in a single template file and no other mse sets! Stopping.")
         return
 
 
@@ -54,6 +51,9 @@ def main():
 
     nameCounter = 0
     for file in os.listdir("./place_mse_sets_here/"):
+        if file == ".gitkeep":
+            continue
+
         print("copying file " + file)
         try:
             copyAndExtract("./place_mse_sets_here/" + file, "setNum" + str(nameCounter))
@@ -64,6 +64,10 @@ def main():
 
     imageCounter = 0 # indexing at 0 because MSE indexes at 0 and I am the one with power here
     for setFolder in os.listdir(PATH_TO_TEMP_SETS):
+        # ignore gitkeep
+        if setFolder == ".gitkeep":
+            continue
+
         setImages = [f for f in os.listdir(PATH_TO_TEMP_SETS + setFolder) if f.startswith("image")]
 
         # grab cards from set file
@@ -118,22 +122,22 @@ def main():
 
 
 def cleanUp(log=False):
-    if len(os.listdir("./temp/temp_sets/")) > 0:
+    if len(os.listdir("./temp/temp_sets/")) > 1:
         if log:
             print("temp_sets folder has junk in there. Cleaning it up...")
         emptyDir("./temp/temp_sets/")
 
-    if len(os.listdir("./temp/temp_template/")) > 0:
+    if len(os.listdir("./temp/temp_template/")) > 1:
         if log:
             print("temp_template folder has junk in there. Cleaning it up...")
         emptyDir("./temp/temp_template/")
 
-    if len(os.listdir("./temp/zips/")) > 0:
+    if len(os.listdir("./temp/zips/")) > 1:
         if log:
             print("zips folder has junk in there. Cleaning it up...")
         emptyDir("./temp/zips/")
 
-    if len(os.listdir("./output/")) > 0:
+    if len(os.listdir("./output/")) > 1:
         if log:
             print("Output folder has the following files:")
             for file in os.listdir("./output/"):
@@ -211,6 +215,9 @@ def emptyDir(path):
     contents = os.listdir(path)
 
     for obj in contents:
+        if obj == ".gitkeep":
+            continue
+
         if os.path.isdir(path + obj):
             emptyDir(path + obj + "/")
             os.rmdir(path + obj) 
