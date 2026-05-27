@@ -1,0 +1,12 @@
+output/*
+!output/.gitkeep 
+place_mse_sets_here/*
+!place_mse_sets_here/.gitkeep 
+place_template_set_here/*
+!place_template_set_here/.gitkeep 
+temp/temp_sets/*
+!temp/temp_sets/.gitkeep 
+temp/temp_template/*
+!temp/temp_template/.gitkeep 
+temp/zips/*
+!temp/zips/.gitkeep 
