@@ -104,8 +104,6 @@ def main():
     setBottom = getBottomFromSetFile(PATH_TO_TEMP_LATE + "template/set")
     appendToOutputSetFile(setBottom)
 
-    cleanUp()
-
     # Zip up the contents of the output folder
     zf = zipfile.ZipFile("./output/combined.mse-set", mode="w")
     try:
@@ -118,9 +116,10 @@ def main():
     finally:
         zf.close()
 
+    cleanUp()
+
     print("Done! All is now one.")
     print("file is in output/combined.mse-set")
-
 
 
 def cleanUp(log=False):
@@ -143,12 +142,12 @@ def cleanUp(log=False):
         if log:
             print("Output folder has the following files:")
             for file in os.listdir("./output/"):
-                if file != ".gitkeep":
+                if file != ".gitkeep" or file != "combined.mse-set":
                     print(file)
             if input("\nDelete these files? Y for yes, n for no.\n") != "Y":
                 raise KeyboardInterrupt("Go get everything you need out of output!") 
         else:
-            emptyDir("./output/")
+            emptyDir("./output/", ignore=["combined.mse-set"])
 
 
 
@@ -214,11 +213,11 @@ def getBottomFromSetFile(filepath):
 def getCardsFromSetFile(filepath):
     return getFromSetFile(filepath, startIndicator="card:\n", endIndicator="version_control:\n")
 
-def emptyDir(path):
+def emptyDir(path, ignore=[]):
     contents = os.listdir(path)
 
     for obj in contents:
-        if obj == ".gitkeep":
+        if obj == ".gitkeep" or obj in ignore:
             continue
 
         if os.path.isdir(path + obj):
