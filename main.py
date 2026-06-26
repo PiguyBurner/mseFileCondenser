@@ -110,7 +110,7 @@ def main():
     appendToOutputSetFile(setBottom)
 
     # Zip up the contents of the output folder
-    zf = zipfile.ZipFile("./output/combined.mse-set", mode="w")
+    zf = zipfile.ZipFile("./temp/combined.mse-set", mode="w")
     try:
         for filename in os.listdir("./output/"):
             if filename == ".gitkeep":
@@ -120,6 +120,7 @@ def main():
         print("that's really odd; file not found despite checking for all the files here")
     finally:
         zf.close()
+        shutil.move("./temp/combined.mse-set", "./output/combined.mse-set")
 
     cleanUp(leaveCombined=True)
 
