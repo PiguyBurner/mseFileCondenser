@@ -62,7 +62,7 @@ def main():
             print("error with extracting " + str(file) + ". Continuing on...")
     
 
-    imageCounter = 0 # indexing at 0 because MSE indexes at 0 and I am the one with power here
+    imageCounter = 1 # indexing at 0 because MSE indexes at 1 and it's incredibly rude
     for setFolder in os.listdir(PATH_TO_TEMP_SETS):
         # ignore gitkeep
         if setFolder == ".gitkeep":
@@ -75,24 +75,29 @@ def main():
 
         # change the names of each image file and copy into output
         for img in setImages:
-            newImgName = "setCondensed" + str(imageCounter) 
+            tempImgName = "setCondensed" + str(imageCounter) 
+            newImgName = "image" + str(imageCounter)
             imageCounter += 1
 
             # copy over the images with new name
             shutil.copy(PATH_TO_TEMP_SETS + setFolder + "/" + img, PATH_TO_OUTPUT + newImgName) # copy img over
 
             
-            # replace old image name
+            # replace old image name with temporary one
             for i in range(len(cards)):
                 # new lines and file extension checks should handle weird things
                 # like image1 and image13 bumping heads
-                cards[i] = cards[i].replace(": " + img + "\n",": " + newImgName + "\n")
-                cards[i] = cards[i].replace(": " + img + ".png\n",": " + newImgName + "\n")
-                cards[i] = cards[i].replace(": " + img + ".jpg\n",": " + newImgName + "\n")
-            
+                cards[i] = cards[i].replace(": " + img + "\n",": " + tempImgName + "\n")
+                cards[i] = cards[i].replace(": " + img + ".png\n",": " + tempImgName + "\n")
+                cards[i] = cards[i].replace(": " + img + ".jpg\n",": " + tempImgName + "\n")
+
+        # Then go ahead and change them back to image1-imageN format because MSE needs them named as such (stupidly)
+        for n in range(imageCounter + 1):
+            for i in range(len(cards)):
+                cards[i] = cards[i].replace(": setCondensed" + str(n) + "\n",": image" + str(n) + "\n")
+
         # copy over the cards block
         appendToOutputSetFile(cards)
-
 
 
     #
@@ -116,13 +121,13 @@ def main():
     finally:
         zf.close()
 
-    cleanUp()
+    cleanUp(leaveCombined=True)
 
     print("Done! All is now one.")
     print("file is in output/combined.mse-set")
 
 
-def cleanUp(log=False):
+def cleanUp(log=False, leaveCombined=False):
     if len(os.listdir("./temp/temp_sets/")) > 1:
         if log:
             print("temp_sets folder has junk in there. Cleaning it up...")
@@ -142,16 +147,19 @@ def cleanUp(log=False):
         if log:
             print("Output folder has the following files:")
             for file in os.listdir("./output/"):
-                if file != ".gitkeep" or file != "combined.mse-set":
+                if file != ".gitkeep":
                     print(file)
             if input("\nDelete these files? Y for yes, n for no.\n") != "Y":
                 raise KeyboardInterrupt("Go get everything you need out of output!") 
-        else:
+    
+        if leaveCombined:
             emptyDir("./output/", ignore=["combined.mse-set"])
+        else:
+            emptyDir("./output/")
 
 
 
-def copyAndExtract(filepath, newFilename, template=False):#
+def copyAndExtract(filepath, newFilename, template=False):
     temp_path = PATH_TO_TEMP_SETS
     if template:
         temp_path = PATH_TO_TEMP_LATE
