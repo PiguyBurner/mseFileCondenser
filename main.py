@@ -69,27 +69,30 @@ def main():
             continue
 
         setImages = [f for f in os.listdir(PATH_TO_TEMP_SETS + setFolder) if f.startswith("image")]
+        mainframeImages = [f for f in os.listdir(PATH_TO_TEMP_SETS + setFolder) if f.startswith("mainframe_image")]
 
         # grab cards from set file
         cards = getCardsFromSetFile(PATH_TO_TEMP_SETS + setFolder + "/set")
 
-        # change the names of each image file and copy into output
-        for img in setImages:
-            tempImgName = "setCondensed" + str(imageCounter) 
-            newImgName = "image" + str(imageCounter)
-            imageCounter += 1
+        for imgArr in [setImages, mainframeImages]:
+            # change the names of each image file and copy into output
+            for img in imgArr:
+                newImgName = "image" + str(imageCounter)
 
-            # copy over the images with new name
-            shutil.copy(PATH_TO_TEMP_SETS + setFolder + "/" + img, PATH_TO_OUTPUT + newImgName) # copy img over
+                # copy over the images with new name
+                shutil.copy(PATH_TO_TEMP_SETS + setFolder + "/" + img, PATH_TO_OUTPUT + newImgName) # copy img over
 
-            
-            # replace old image name with temporary one
-            for i in range(len(cards)):
-                # new lines and file extension checks should handle weird things
-                # like image1 and image13 bumping heads
-                cards[i] = cards[i].replace(": " + img + "\n",": " + tempImgName + "\n")
-                cards[i] = cards[i].replace(": " + img + ".png\n",": " + tempImgName + "\n")
-                cards[i] = cards[i].replace(": " + img + ".jpg\n",": " + tempImgName + "\n")
+                
+                # replace old image name with temporary one
+                for i in range(len(cards)):
+                    # new lines and file extension checks should handle weird things
+                    # like image1 and image13 bumping heads
+
+                    # Some files have both image1.png and image1 as files, so this handles it
+                    if (": " + img + "\n") in cards[i]:
+                        cards[i] = cards[i].replace(": " + img + "\n",": setCondensed" + str(imageCounter) + "\n")
+                        imageCounter += 1
+                    
 
         # Then go ahead and change them back to image1-imageN format because MSE needs them named as such (stupidly)
         for n in range(imageCounter + 1):
@@ -115,6 +118,13 @@ def main():
         for filename in os.listdir("./output/"):
             if filename == ".gitkeep":
                 continue
+
+            # SOme error handling on my part
+            try: 
+                filename.index(".")
+                print("File" + filename + "with not accounted for ending! This may break things; go tell Piguy about it")
+            except:
+                pass
             zf.write("./output/" + filename, filename, compress_type=zipfile.ZIP_DEFLATED)
     except FileNotFoundError:
         print("that's really odd; file not found despite checking for all the files here")
@@ -133,6 +143,8 @@ def cleanUp(log=False, leaveCombined=False):
         if log:
             print("temp_sets folder has junk in there. Cleaning it up...")
         emptyDir("./temp/temp_sets/")
+        # emptyDir("./output/", ignore=["set"])    # For debugging
+
 
     if len(os.listdir("./temp/temp_template/")) > 1:
         if log:
@@ -155,6 +167,7 @@ def cleanUp(log=False, leaveCombined=False):
     
         if leaveCombined:
             emptyDir("./output/", ignore=["combined.mse-set"])
+            # emptyDir("./output/", ignore=["combined.mse-set", "set"])    # For debugging
         else:
             emptyDir("./output/")
 
